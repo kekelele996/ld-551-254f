@@ -55,6 +55,8 @@ CREATE TABLE IF NOT EXISTS enrollments (
   course_id INTEGER NOT NULL REFERENCES courses(id),
   enrolled_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   progress DOUBLE PRECISION NOT NULL DEFAULT 0,
+  is_completed BOOLEAN NOT NULL DEFAULT FALSE,
+  completed_at TIMESTAMPTZ,
   last_access_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   CONSTRAINT uq_enrollment_user_course UNIQUE (user_id, course_id)
 );
@@ -62,11 +64,21 @@ CREATE TABLE IF NOT EXISTS enrollments (
 CREATE TABLE IF NOT EXISTS lesson_progress (
   id SERIAL PRIMARY KEY,
   enrollment_id INTEGER NOT NULL REFERENCES enrollments(id) ON DELETE CASCADE,
-  lesson_id INTEGER NOT NULL REFERENCES lessons(id),
+  lesson_id INTEGER NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
   completed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   score INTEGER,
   CONSTRAINT uq_progress_enrollment_lesson UNIQUE (enrollment_id, lesson_id)
 );
+
+-- 测验每次提交一行；lesson_progress.score 保存历史最高分（重做考砸进度不掉）
+CREATE TABLE IF NOT EXISTS quiz_attempts (
+  id SERIAL PRIMARY KEY,
+  progress_id INTEGER NOT NULL REFERENCES lesson_progress(id) ON DELETE CASCADE,
+  score INTEGER NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_quiz_attempts_progress ON quiz_attempts(progress_id, created_at);
 
 CREATE TABLE IF NOT EXISTS orders (
   id SERIAL PRIMARY KEY,

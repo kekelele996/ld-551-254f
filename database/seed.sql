@@ -30,9 +30,12 @@ INSERT INTO lesson_progress (id, enrollment_id, lesson_id, score) VALUES
   (1, 1, 1, NULL)
 ON CONFLICT (id) DO NOTHING;
 
+-- quiz_attempts 表无内置种子数据；学员重做测验时每次提交写入一行
+
 SELECT setval('users_id_seq', 10, true);
 SELECT setval('courses_id_seq', 10, true);
 SELECT setval('chapters_id_seq', 10, true);
 SELECT setval('lessons_id_seq', 10, true);
 SELECT setval('enrollments_id_seq', 10, true);
 SELECT setval('lesson_progress_id_seq', 10, true);
+SELECT setval('quiz_attempts_id_seq', 10, true);

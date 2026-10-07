@@ -5,6 +5,7 @@ from app.models.enrollment import Enrollment
 from app.models.lesson import Lesson
 from app.models.order import Order
 from app.models.progress import LessonProgress
+from app.models.quiz_attempt import QuizAttempt
 from app.models.user import User
 
 __all__ = [
@@ -15,5 +16,6 @@ __all__ = [
     "Lesson",
     "Order",
     "LessonProgress",
+    "QuizAttempt",
     "User",
 ]
