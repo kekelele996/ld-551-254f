@@ -11,7 +11,15 @@
     <template #default="{ data }">
       <span class="tree-node">
         <span>{{ data.label }}</span>
-        <el-tag v-if="data.lesson?.is_free" size="small">试看</el-tag>
+        <span class="node-tags">
+          <el-tag v-if="data.lesson?.is_free" size="small">试看</el-tag>
+          <template v-if="data.state">
+            <el-tag v-if="data.state.status === 'completed'" size="small" type="success">已完成</el-tag>
+            <el-tag v-else-if="data.state.status === 'failed'" size="small" type="danger">
+              未及格{{ data.state.best_score !== null ? ` ${data.state.best_score}分` : '' }}
+            </el-tag>
+          </template>
+        </span>
       </span>
     </template>
   </el-tree>
@@ -20,9 +28,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Chapter } from '@/types/chapter'
+import type { LessonProgressState } from '@/types/enrollment'
 import type { Lesson } from '@/types/lesson'
 
-const props = defineProps<{ chapters: Chapter[] }>()
+const props = defineProps<{ chapters: Chapter[]; lessonStates?: Record<number, LessonProgressState> }>()
 const emit = defineEmits<{ selectLesson: [lesson: Lesson] }>()
 
 const treeData = computed(() =>
@@ -32,7 +41,8 @@ const treeData = computed(() =>
     children: chapter.lessons.map((lesson) => ({
       key: `lesson-${lesson.id}`,
       label: `${lesson.sort_order}. ${lesson.title} · ${lesson.duration}分钟`,
-      lesson
+      lesson,
+      state: props.lessonStates?.[lesson.id] || null
     }))
   }))
 )
@@ -58,5 +68,10 @@ function handleClick(data: { lesson?: Lesson }) {
   display: flex;
   justify-content: space-between;
   gap: 8px;
+}
+
+.node-tags {
+  display: inline-flex;
+  gap: 4px;
 }
 </style>

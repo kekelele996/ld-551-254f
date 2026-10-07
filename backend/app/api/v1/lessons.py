@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 
 from app.api.deps import require_role
 from app.constants.enums import UserRole
 from app.core.database import get_db
+from app.models.user import User
 from app.schemas.chapter import ChapterCreate, ChapterResponse
 from app.schemas.lesson import LessonCreate, LessonResponse, LessonUpdate
 from app.services.lesson_service import LessonService
@@ -29,3 +30,8 @@ def create_lesson(payload: LessonCreate, _: object = Depends(require_role(UserRo
 @router.put("/{lesson_id}", response_model=LessonResponse)
 def update_lesson(lesson_id: int, payload: LessonUpdate, _: object = Depends(require_role(UserRole.INSTRUCTOR, UserRole.ADMIN)), db: Session = Depends(get_db)):
     return LessonService.update_lesson(db, lesson_id, payload)
+
+
+@router.delete("/{lesson_id}", status_code=204)
+def delete_lesson(lesson_id: int, request: Request, user: User = Depends(require_role(UserRole.INSTRUCTOR, UserRole.ADMIN)), db: Session = Depends(get_db)):
+    LessonService.delete_lesson(db, lesson_id, user.id, request.client.host if request.client else None)

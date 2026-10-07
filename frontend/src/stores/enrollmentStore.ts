@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { Enrollment, ProgressSummary } from '@/types/enrollment'
+import type { Enrollment, LessonCompleteResult, ProgressSummary } from '@/types/enrollment'
 import request from '@/utils/request'
 
 export const useEnrollmentStore = defineStore('enrollment', () => {
@@ -16,9 +16,9 @@ export const useEnrollmentStore = defineStore('enrollment', () => {
   }
 
   async function completeLesson(lessonId: number, score?: number) {
-    const enrollment = await request.post<unknown, Enrollment>('/enrollments/progress/complete', { lesson_id: lessonId, score })
-    await fetchProgress(enrollment.course_id)
-    return enrollment
+    const result = await request.post<unknown, LessonCompleteResult>('/enrollments/progress/complete', { lesson_id: lessonId, score })
+    await fetchProgress(result.course_id)
+    return result
   }
 
   return { enrollments, progress, fetchEnrollments, fetchProgress, completeLesson }

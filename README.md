@@ -10,6 +10,16 @@ EduFlow 是一个前后端分离的在线课程学习平台，覆盖课程发布
 - 支付：Mock 支付服务，支持 `PENDING -> PAID -> REFUNDED` 和 `PENDING -> CANCELLED` 状态流转，重复支付回调幂等处理。
 - 横切能力：JWT 认证、RBAC、数据范围过滤、统一异常响应、写操作审计日志。
 
+## 学习与结业规则
+
+- **课时完成标准**：视频、文本课时照旧标记完成；测验（QUIZ）课时提交后需达到 **60 分及格线** 才算完成，未达标的课时在学习页标记为"未及格"，**不计入已完成课时数**。
+- **测验计分规则（按历史最高分）**：同一测验可多次重做，课时完成状态与课程进度一律按**历史最高分**计算——重做考砸不会拉低分数，已完成进度不会回退。该规则在学习页测验区域有明示。
+- **课程结业**：一门课的全部课时都完成后课程结业（`enrollments.completed_at` 写入结业时间），学员仪表盘展示"结业课程"统计与"已结业"标识。
+- **课时增减重算**：讲师新增或删除课时（`POST /api/lessons`、`DELETE /api/lessons/{id}`）后，该课程所有已注册学员的进度自动重算；课时增加导致不再满足结业条件时，结业状态同步取消。
+- 规则常量前后端各维护一份：`backend/app/constants/rules.py` 与 `frontend/src/constants/rules.ts`。
+
+> 注意：本次需求调整了 `enrollments` 与 `lesson_progress` 表结构（新增 `completed_at`、`attempts` 等列）。已有数据卷的环境请删除旧卷后重建：`docker compose down -v && docker compose up --build`。
+
 ## 快速启动 Docker Compose
 
 ```bash

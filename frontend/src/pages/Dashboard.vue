@@ -6,11 +6,17 @@
     <div class="stats">
       <el-statistic title="已注册课程" :value="enrollments.length" />
       <el-statistic title="总学习进度" :value="averageProgress" suffix="%" />
-      <el-statistic title="已完成课程" :value="completedCount" />
+      <el-statistic title="结业课程" :value="completedCount" />
     </div>
     <h2>我的课程</h2>
     <div class="grid">
-      <CourseCard v-for="item in enrollments" :key="item.id" :course="item.course!" :progress="item.progress" />
+      <CourseCard
+        v-for="item in enrollments"
+        :key="item.id"
+        :course="item.course!"
+        :progress="item.progress"
+        :completed="item.completed_at !== null"
+      />
     </div>
   </section>
 </template>
@@ -26,7 +32,8 @@ const averageProgress = computed(() => {
   if (!enrollments.value.length) return 0
   return Math.round(enrollments.value.reduce((sum, item) => sum + item.progress, 0) / enrollments.value.length)
 })
-const completedCount = computed(() => enrollments.value.filter((item) => item.progress >= 100).length)
+// 结业 = 全部课时完成（后端在 enrollment.completed_at 写入结业时间）
+const completedCount = computed(() => enrollments.value.filter((item) => item.completed_at !== null).length)
 
 onMounted(store.fetchEnrollments)
 </script>

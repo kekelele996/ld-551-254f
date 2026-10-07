@@ -16,6 +16,8 @@ class Enrollment(Base):
     enrolled_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     progress: Mapped[float] = mapped_column(default=0, nullable=False)
     last_access_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    # 结业时间：全部课时完成后写入；课时增减重算后不再满足结业条件时清空
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     user = relationship("User", back_populates="enrollments")
     course = relationship("Course", back_populates="enrollments")

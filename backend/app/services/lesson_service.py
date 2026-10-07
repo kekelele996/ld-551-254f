@@ -3,9 +3,12 @@ from sqlalchemy.orm import Session
 from app.exceptions.course import CourseNotFoundException
 from app.models.chapter import Chapter
 from app.models.lesson import Lesson
+from app.models.progress import LessonProgress
 from app.schemas.chapter import ChapterCreate
 from app.schemas.lesson import LessonCreate, LessonUpdate
+from app.services.audit_service import AuditService
 from app.services.course_service import CourseService
+from app.services.enrollment_service import EnrollmentService
 
 
 class LessonService:
@@ -26,6 +29,7 @@ class LessonService:
         db.add(lesson)
         db.flush()
         CourseService.recalculate_course_stats(db, chapter.course_id)
+        EnrollmentService.recalculate_course_progress(db, chapter.course_id)
         db.commit()
         db.refresh(lesson)
         return lesson
@@ -47,3 +51,16 @@ class LessonService:
         db.commit()
         db.refresh(lesson)
         return lesson
+
+    @staticmethod
+    def delete_lesson(db: Session, lesson_id: int, user_id: int | None = None, ip_address: str | None = None) -> None:
+        lesson = LessonService.get_lesson(db, lesson_id)
+        course_id = lesson.chapter.course_id
+        # 清理该课时的学员进度记录，避免残留数据计入进度
+        db.query(LessonProgress).filter(LessonProgress.lesson_id == lesson_id).delete()
+        AuditService.record(db, user_id=user_id, action="DELETE", entity="Lesson", entity_id=str(lesson_id), before_data={"title": lesson.title, "course_id": course_id}, ip_address=ip_address)
+        db.delete(lesson)
+        db.flush()
+        CourseService.recalculate_course_stats(db, course_id)
+        EnrollmentService.recalculate_course_progress(db, course_id)
+        db.commit()

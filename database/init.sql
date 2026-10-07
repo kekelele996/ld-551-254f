@@ -56,15 +56,17 @@ CREATE TABLE IF NOT EXISTS enrollments (
   enrolled_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   progress DOUBLE PRECISION NOT NULL DEFAULT 0,
   last_access_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  completed_at TIMESTAMPTZ,
   CONSTRAINT uq_enrollment_user_course UNIQUE (user_id, course_id)
 );
 
 CREATE TABLE IF NOT EXISTS lesson_progress (
   id SERIAL PRIMARY KEY,
   enrollment_id INTEGER NOT NULL REFERENCES enrollments(id) ON DELETE CASCADE,
-  lesson_id INTEGER NOT NULL REFERENCES lessons(id),
-  completed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  lesson_id INTEGER NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
+  completed_at TIMESTAMPTZ,
   score INTEGER,
+  attempts INTEGER NOT NULL DEFAULT 0,
   CONSTRAINT uq_progress_enrollment_lesson UNIQUE (enrollment_id, lesson_id)
 );
 

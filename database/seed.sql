@@ -18,16 +18,17 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO lessons (id, chapter_id, title, type, content, duration, is_free, sort_order) VALUES
   (1, 1, '课程导学', 'TEXT', '欢迎来到 EduFlow 课程，本节介绍学习路线。', 15, TRUE, 1),
   (2, 1, '环境搭建视频', 'VIDEO', 'https://example.com/videos/setup.mp4', 35, TRUE, 2),
-  (3, 2, '权限测验', 'QUIZ', '{"questions":[{"title":"JWT 用于什么？","answer":"身份认证"}]}', 45, FALSE, 1),
-  (4, 3, '设计思维概览', 'TEXT', '理解用户、定义问题、发散方案、验证原型。', 25, TRUE, 1)
+  (3, 2, '权限测验', 'QUIZ', '{"questions":[{"title":"JWT 主要用于什么？","answer":"身份认证"},{"title":"EduFlow 中测验课时的及格分数是多少？","answer":"60"}]}', 45, FALSE, 1),
+  (4, 3, '设计思维概览', 'TEXT', '理解用户、定义问题、发散方案、验证原型。', 25, TRUE, 1),
+  (5, 3, '设计基础测验', 'QUIZ', '{"questions":[{"title":"设计流程的第一步是理解谁？","answer":"用户"}]}', 25, FALSE, 2)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO enrollments (id, user_id, course_id, progress) VALUES
   (1, 3, 1, 33.33)
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO lesson_progress (id, enrollment_id, lesson_id, score) VALUES
-  (1, 1, 1, NULL)
+INSERT INTO lesson_progress (id, enrollment_id, lesson_id, completed_at, score, attempts) VALUES
+  (1, 1, 1, NOW(), NULL, 0)
 ON CONFLICT (id) DO NOTHING;
 
 SELECT setval('users_id_seq', 10, true);

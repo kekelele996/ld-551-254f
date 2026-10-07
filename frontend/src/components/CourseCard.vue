@@ -6,6 +6,7 @@
         <el-tag size="small">{{ course.category }}</el-tag>
         <el-tag size="small" type="success">{{ courseLevelLabel[course.level] }}</el-tag>
         <el-tag v-if="showStatus" size="small" type="info">{{ courseStatusLabel[course.status] }}</el-tag>
+        <el-tag v-if="completed" size="small" type="warning">已结业</el-tag>
       </div>
       <h3>{{ course.title }}</h3>
       <p>{{ course.description }}</p>
@@ -33,6 +34,7 @@ defineProps<{
   course: Course
   progress?: number
   showStatus?: boolean
+  completed?: boolean
 }>()
 </script>
 
